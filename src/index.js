@@ -4,6 +4,7 @@ const cors =require("cors");
 
 const countryRoutes = require('./routes/routesMundo/countries.routes')
 const stateRoutes = require('./routes/routesMundo/states.routes')
+const consultRoutes = require('./routes/routesQueries/query.routes')
 
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use(countryRoutes);
 app.use(stateRoutes);
+app.use(consultRoutes);
 
 app.use((err, req, res, next)=>{
     return res.json({
