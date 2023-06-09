@@ -1,22 +1,23 @@
 const { Router } = require('express');
-const { getAllCountries, getCountry, createCountry, deleteCountry, updateCountry } = require('../../controllers/controllerMundo/countries.controller');
+
 
 
 
 const pool = require('../../db');
+const { getAllState, getStates, createState, deleteState, updateState } = require('../../controllers/controllerMundo/states.controller');
 
 
 const router = Router();
 
-router.get('/country', getAllCountries)
+router.get('/state', getAllState)
 
-router.get('/country/:id', getCountry)
+router.get('/state/:id', getStates)
 
-router.post('/country', createCountry)
+router.post('/state', createState)
 
-router.delete('/country/:id', deleteCountry)
+router.delete('/state/:id', deleteState)
 
-router.put('/country/:id', updateCountry)
+router.put('/state/:id', updateState)
 
 
 module.exports = router;

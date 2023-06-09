@@ -2,7 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const cors =require("cors");
 
-const taskRoutes = require('./routes/routesMundo/countries.routes')
+const countryRoutes = require('./routes/routesMundo/countries.routes')
+const stateRoutes = require('./routes/routesMundo/states.routes')
 
 
 const app = express();
@@ -11,7 +12,8 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-app.use(taskRoutes);
+app.use(countryRoutes);
+app.use(stateRoutes);
 
 app.use((err, req, res, next)=>{
     return res.json({
