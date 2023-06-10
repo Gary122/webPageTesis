@@ -1,23 +1,37 @@
-import { Button, Card, CardContent, Grid, TextField, Typography } from "@mui/material"
+import { Button, Card, CardContent, CircularProgress, Grid, TextField, Typography } from "@mui/material"
 import { useState, useEffect } from "react";
+import { useNavigate} from 'react-router-dom'
 
 
 
 export default function TaskForm() {
 
-    const [task, setTask] = useState({
-      title: '',
-      description: '',
-    })
+  const [task, setTask] = useState({
+    title: "",
+    description: "",
+  });
+  const [loading, setLoading] = useState(false)
 
-    const handleSubmit = e =>{
-      e.preventDefault();
-      console.log(task)
-    };
+  const navigate = useNavigate()
 
-    const handelChange =e => {
-      setTask({...task, [e.target.name]: e.target.value});
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+
+    const res = await fetch("http://localhost:4000/tasks", {
+      method: "POST",
+      body: JSON.stringify(task),
+      headers: {"Content-Type": "application/json"},
+  });
+    const data = await res.json();
+
+    setLoading(false)
+    navigate('/')
+  };
+
+  const handelChange = e => {
+    setTask({ ...task, [e.target.name]: e.target.value });
+  }
 
   return (
     <Grid container direction="column" alignItems="center" justifyContent="center">
@@ -40,8 +54,8 @@ export default function TaskForm() {
 
                 name="title"
                 onChange={handelChange}
-                inputProps={{style:{color:"white"}}}
-                InputLabelProps={{style:{color:"white"}}}
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: "white" } }}
               />
 
               <TextField
@@ -55,12 +69,15 @@ export default function TaskForm() {
                 }}
                 name="description"
                 onChange={handelChange}
-                inputProps={{style:{color:"white"}}}
-                InputLabelProps={{style:{color:"white"}}}
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: "white" } }}
               />
 
-              <Button variant='contained' color='primary' type='submit'>
-                Save
+              <Button variant='contained' color='primary' type='submit' disabled={!task.title || !task.description}>
+                {loading ? <CircularProgress
+                  color='inherit'
+                    size={24}
+                  /> : 'Create'}
               </Button>
 
             </form>
