@@ -2,18 +2,19 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import Menu from "./components/Navbar"
-import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 
 export default function App() {
+  
   return (
     <BrowserRouter>   
       <Menu/>
-      <Container>
+      <Box>
         <Routes>
           <Route path="/" element={<TaskList />} />
           <Route path="/tasks/new" element={<TaskForm />} />
         </Routes>
-      </Container>
+      </Box>
     </BrowserRouter>
   )
 }
