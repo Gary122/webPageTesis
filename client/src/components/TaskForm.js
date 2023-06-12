@@ -41,12 +41,12 @@ export default function TaskForm() {
             backgroundColor: '#1e272e',
             padding: '1rem'
           }}>
-          <Typography variant='5' textAlign='center' color='white'>  Create Task </Typography>
+          <Typography variant='5' textAlign='center' color='white'>  Ingrese a su perfil </Typography>
           <CardContent>
             <form onSubmit={handleSubmit}>
               <TextField
                 variant='filled'
-                label='write your tittle'
+                label='usuario'
                 sx={{
                   display: 'block',
                   margin: '.5rem 0'
@@ -60,7 +60,7 @@ export default function TaskForm() {
 
               <TextField
                 variant='filled'
-                label='Write your description'
+                label='contraseña'
                 multiline
                 rows={4}
                 sx={{

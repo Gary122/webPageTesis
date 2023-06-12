@@ -7,6 +7,8 @@ const getConsult = async (req, res, next) => {
         "ESPECIE.ESP_SEXO, " +
         "LOC.LOC_PARQUE_NACIONAL, " +
         "LOC.GEOM, " +
+        "LOC.LOC_LATITUD, " +
+        "LOC.LOC_LONGITUD, " +
         "PRO.PRO_NOMBRE, " +
         "PA.PAS_NOMBRE, " +
         "IDE.IDE_APELLIDO, " +
