@@ -2,7 +2,7 @@ const pool = require("../../db");
 
 const getAllCountries = async (req, res, next) => {
     try {
-        const allTasks = await pool.query("SELECT * FROM pais");
+        const allTasks = await pool.query("SELECT pas_nombre FROM pais order by pas_nombre asc");
         res.json(allTasks.rows);
 
     } catch (error) {

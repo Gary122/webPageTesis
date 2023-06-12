@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "@mui/system";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography } from '@mui/material';
 import bannerImage from '../imagenes/bannerInicio.jpg';  // Asegúrate de cambiar esto a la ruta correcta de tu imagen
-import Box from '@mui/material/Box';
+import { Box, FormControl, InputLabel, Select, MenuItem, Typograph } from '@mui/material';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+
+
+
+
 
 const StyledBannerImage = styled('div')({
   backgroundImage: `url(${bannerImage})`,
@@ -20,6 +31,16 @@ const StyledBannerImage = styled('div')({
   color: '#FFFFFF',
   margin: '0 auto',
 });
+
+const StyledForm = styled('form')({
+  background: 'rgba(255, 255, 255, 1)',  // Un fondo blanco con opacidad del 70%.
+  padding: '20px',
+  borderRadius: '10px',  // Bordes redondeados.
+  boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',  // Sombra para darle un poco de profundidad.
+  opacity: 0.8
+
+});
+
 
 const ContentContainer = styled('div')({
   display: 'flex',
@@ -60,21 +81,75 @@ const StyledTableContainer = styled(TableContainer)({
 });
 
 export default function TaskList() {
-  const [tasks, setTasks] = useState([])
+  const [openDialog, setOpenDialog] = useState(false);
 
-  const loadTasks = async () => {
-    const response = await fetch('http://localhost:4000/consult/Pichincha')
-    const data = await response.json()
-    setTasks(data)
-  }
+  const [tasks, setTasks] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [provinces, setProvinces] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [isTableVisible, setIsTableVisible] = useState(false);
+
+
+  const loadTasks = async (province) => {
+    const response = await fetch(`http://localhost:4000/consult/${province}`);
+    const data = await response.json();
+    if (data.message) {
+      setOpenDialog(true);
+      setIsTableVisible(false); // Ocultar la tabla si se abre el diálogo
+    } else {
+      setTasks(data);
+      setIsTableVisible(data.length > 0);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setIsTableVisible(false); // Ocultar la tabla cuando se cierra el diálogo
+  };
 
   useEffect(() => {
-    loadTasks()
-  }, [])
+    fetch('http://localhost:4000/country')
+      .then(response => response.json())
+      .then(data => setCountries(data))
+      .catch(error => console.error('Error:', error));
+  }, []);
+
+  useEffect(() => {
+    if (selectedCountry !== '') {
+      fetch(`http://localhost:4000/stateByCountry/${selectedCountry}`)
+        .then(response => response.json())
+        .then(data => setProvinces(data))
+        .catch(error => console.error('Error:', error));
+    }
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      loadTasks(selectedProvince);
+    }
+  }, [selectedProvince]);
+
+  const handleCountryChange = (event) => {
+    setSelectedCountry(event.target.value);
+    setProvinces([]);
+    setSelectedProvince('');
+  };
+
+  const handleProvinceChange = (event) => {
+    setSelectedProvince(event.target.value);
+  };
+
+  const handleSearch = () => {
+    if (selectedProvince) {
+      loadTasks(selectedProvince);
+    }
+  };
+
+
 
   return (
     <>
-
       <StyledBannerImage>
         <ContentContainer>
           <Box sx={{
@@ -86,46 +161,113 @@ export default function TaskList() {
             <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
           </Box>
           <Box sx={{ width: { xs: '100%', sm: '45%' }, fontSize: '1.2em', margin: '0 10px' }}>
-            <form>
-              {/* Aquí va tu formulario */}
-            </form>
+
+
+            <StyledForm>
+              <Typography variant="h" color="#000080"  gutterBottom component="div">
+                Fitrar por provincias
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <FormControl variant="filled" sx={{ minWidth: 120, margin: '0 10px' }}>
+                  <InputLabel id="country-select-label">País</InputLabel>
+                  <Select
+                    labelId="country-select-label"
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                  >
+                    {/* Aquí es donde mapeas los países para generar los elementos de menú */}
+                    {countries.map((country, index) => (
+                      <MenuItem key={index} value={country.pas_nombre.trim()}>
+                        {country.pas_nombre.trim()}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl variant="filled" sx={{ minWidth: 120, margin: '0 10px' }}>
+                  <InputLabel id="province-select-label">Provincia</InputLabel>
+                  <Select
+                    labelId="province-select-label"
+                    value={selectedProvince}
+                    onChange={handleProvinceChange}
+                  >
+                    {/* Y aquí es donde mapeas las provincias para generar los elementos de menú */}
+                    {provinces && provinces.length > 0 ? (
+                      provinces.map((province, index) => (
+                        <MenuItem key={index} value={province.pro_nombre.trim()}>
+                          {province.pro_nombre.trim()}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem value="">No hay provincias disponibles</MenuItem>
+                    )}
+                  </Select>
+                  <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                  >
+                    <DialogTitle id="alert-dialog-title">{"Advertencia"}</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="alert-dialog-description">
+                        No se encontraron datos para la provincia seleccionada.
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleCloseDialog} color="primary" autoFocus>
+                        Aceptar
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+
+                </FormControl>
+                <Button variant="contained" onClick={handleSearch}>Buscar</Button>
+              </Box>
+
+            </StyledForm>
           </Box>
         </ContentContainer>
       </StyledBannerImage>
-      <StyledTableContainer component={Paper}>
-        <Table aria-label="simple table" stickyHeader>
-          <TableHead>
-            <TableRow>
-              <StyledTableHeaderCell>Especie</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Sexo</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Parque Nacional </StyledTableHeaderCell>
-              <StyledTableHeaderCell>Provincia</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Identificador</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Año identificado</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Colector</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Fecha colectado</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Metodo colectar</StyledTableHeaderCell>
-              <StyledTableHeaderCell>Destino</StyledTableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tasks.map((task) => (
-              <StyledTableRow key={task.esp_nombre}>
-                <StyledTableCell component="th" scope="row">{task.esp_nombre}</StyledTableCell>
-                <StyledTableCell>{task.esp_sexo}</StyledTableCell>
-                <StyledTableCell>{task.loc_parque_nacional}</StyledTableCell>
-                <StyledTableCell>{task.pro_nombre}</StyledTableCell>
-                <StyledTableCell>{task.ide_apellido}</StyledTableCell>
-                <StyledTableCell>{task.ide_anio}</StyledTableCell>
-                <StyledTableCell>{task.col_apellido}</StyledTableCell>
-                <StyledTableCell>{task.col_fecha}</StyledTableCell>
-                <StyledTableCell>{task.col_metodo}</StyledTableCell>
-                <StyledTableCell>{task.col_destino}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </StyledTableContainer>
+      {isTableVisible && (
+        tasks.length > 0 ? (
+          <StyledTableContainer component={Paper}>
+            <Table aria-label="simple table" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <StyledTableHeaderCell>Especie</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Sexo</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Parque Nacional </StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Provincia</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Identificador</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Año identificado</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Colector</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Fecha colectado</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Metodo colectar</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Destino</StyledTableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tasks.map((task) => (
+                  <StyledTableRow key={task.esp_nombre}>
+                    <StyledTableCell component="th" scope="row">{task.esp_nombre}</StyledTableCell>
+                    <StyledTableCell>{task.esp_sexo}</StyledTableCell>
+                    <StyledTableCell>{task.loc_parque_nacional}</StyledTableCell>
+                    <StyledTableCell>{task.pro_nombre}</StyledTableCell>
+                    <StyledTableCell>{task.ide_apellido}</StyledTableCell>
+                    <StyledTableCell>{task.ide_anio}</StyledTableCell>
+                    <StyledTableCell>{task.col_apellido}</StyledTableCell>
+                    <StyledTableCell>{task.col_fecha}</StyledTableCell>
+                    <StyledTableCell>{task.col_metodo}</StyledTableCell>
+                    <StyledTableCell>{task.col_destino}</StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+        ) : (
+          <Typography variant="h6" color="error"></Typography>
+        )
+      )}
     </>
   );
 }

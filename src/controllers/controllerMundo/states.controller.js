@@ -29,6 +29,36 @@ const getStates = async (req, res, next) => {
 
 };
 
+const getStateByCountry = async (req, res, next) => {
+
+    const consult =
+        "SELECT provincia.pro_nombre " +
+        "FROM provincia " +
+        "JOIN pais ON provincia.pas_id = pais.pas_id " +
+        "WHERE pais.pas_nombre = $1 " +
+        "ORDER BY provincia.pro_nombre ASC ";
+
+    try {
+        const { pais } = req.params
+
+        const result = await pool.query(consult, [pais]);
+
+        console.log(result)
+
+        if (result.rows.length === 0)
+            return res.status(404).json({
+                message: "No existe provincias con el pais seleccionado"
+            });
+        //return res.json(result.rows[0]); si pongo [0] me devuelve la primera respuesta
+        return res.json(result.rows);
+
+    } catch (error) {
+        next(error)
+    }
+
+
+};
+
 const createState = async (req, res) => {
     const { pas_id, pro_nombre } = req.body
 
@@ -87,6 +117,7 @@ const updateState = async (req, res) => {
 
 module.exports = {
     getAllState,
+    getStateByCountry,
     getStates,
     createState,
     deleteState,
