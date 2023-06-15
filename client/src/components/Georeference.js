@@ -172,9 +172,7 @@ export default function TaskList() {
         <>
 
             <ContentContainer>
-
                 <Box sx={{ width: '100%', fontSize: '1.2em', margin: '0', boxSizing: 'border-box' }}>
-
 
                     <StyledForm>
                         <Typography variant="h" color="#000080" gutterBottom component="div">

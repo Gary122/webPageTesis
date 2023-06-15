@@ -18,7 +18,7 @@ export default function Navbar() {
               <Button variant="contained" color="primary" onClick={() => navigate("/inicio/geo")} sx={{ margin: '0 10px' }}>
                 Georreferenciación
               </Button>
-              <Button variant="contained" color="primary" onClick={() => navigate("/inicio/new")} sx={{ margin: '0 10px' }}>
+              <Button variant="contained" color="primary" onClick={() => navigate("/inicio/iniciova")} sx={{ margin: '0 10px' }}>
                 Destacados
               </Button>
               <Button variant="contained" color="primary" onClick={() => navigate("/inicio/about")} sx={{ margin: '0 10px' }}>
@@ -27,6 +27,7 @@ export default function Navbar() {
               <Button variant="contained" color="primary" onClick={() => navigate("/inicio/login")} sx={{ margin: '0 10px' }}>
                 Log-In
               </Button>
+              
             </Box>
           </Toolbar>
         </Container>
