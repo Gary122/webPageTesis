@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "@mui/system";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+  IconButton,
+} from '@mui/material';
 import bannerImage from '../imagenes/bannerInicio.jpg';  // Asegúrate de cambiar esto a la ruta correcta de tu imagen
-import { Box, FormControl, InputLabel, Select, MenuItem, Typograph } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-
-
-
-
-
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const StyledBannerImage = styled('div')({
   backgroundImage: `url(${bannerImage})`,
@@ -38,9 +52,7 @@ const StyledForm = styled('form')({
   borderRadius: '10px',  // Bordes redondeados.
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',  // Sombra para darle un poco de profundidad.
   opacity: 0.8
-
 });
-
 
 const ContentContainer = styled('div')({
   display: 'flex',
@@ -51,7 +63,6 @@ const ContentContainer = styled('div')({
     alignItems: 'center',
   },
 });
-
 
 const StyledTableCell = styled(TableCell)({
   padding: '4px',
@@ -89,7 +100,6 @@ export default function TaskList() {
   const [provinces, setProvinces] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState('');
   const [isTableVisible, setIsTableVisible] = useState(false);
-
 
   const loadTasks = async (province) => {
     const response = await fetch(`http://localhost:4000/consult/${province}`);
@@ -146,7 +156,15 @@ export default function TaskList() {
     }
   };
 
+  const handleUpdate = (taskId) => {
+    // Lógica para actualizar la tarea con el ID proporcionado
+    console.log(`Actualizar tarea con ID: ${taskId}`);
+  };
 
+  const handleDelete = (taskId) => {
+    // Lógica para eliminar la tarea con el ID proporcionado
+    console.log(`Eliminar tarea con ID: ${taskId}`);
+  };
 
   return (
     <>
@@ -164,7 +182,7 @@ export default function TaskList() {
 
 
             <StyledForm>
-              <Typography variant="h" color="#000080"  gutterBottom component="div">
+              <Typography variant="h" color="#000080" gutterBottom component="div">
                 Fitrar por provincias
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -245,6 +263,7 @@ export default function TaskList() {
                   <StyledTableHeaderCell>Fecha colectado</StyledTableHeaderCell>
                   <StyledTableHeaderCell>Metodo colectar</StyledTableHeaderCell>
                   <StyledTableHeaderCell>Destino</StyledTableHeaderCell>
+                  <StyledTableHeaderCell>Acciones</StyledTableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -260,6 +279,14 @@ export default function TaskList() {
                     <StyledTableCell>{task.col_fecha}</StyledTableCell>
                     <StyledTableCell>{task.col_metodo}</StyledTableCell>
                     <StyledTableCell>{task.col_destino}</StyledTableCell>
+                    <StyledTableCell>
+                      <IconButton onClick={() => handleUpdate(task.id)} aria-label="actualizar">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handleDelete(task.id)} aria-label="eliminar">
+                        <DeleteIcon />
+                      </IconButton>
+                    </StyledTableCell>
                   </StyledTableRow>
                 ))}
               </TableBody>

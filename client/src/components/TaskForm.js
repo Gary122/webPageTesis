@@ -1,99 +1,95 @@
-import React, { useState } from 'react';
-import { Button, ButtonGroup, Typography, Paper, Container, CssBaseline, Box, Link } from '@mui/material';
-import { styled } from '@mui/system';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import ScienceIcon from '@mui/icons-material/Science';
-import BuildIcon from '@mui/icons-material/Build';
-import SaveIcon from '@mui/icons-material/Save';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import React, { useState, useEffect } from 'react';
+import TreeView from '@mui/lab/TreeView';
+import TreeItem from '@mui/lab/TreeItem';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  color: theme.palette.common.black,
-  border: '1px solid #ddd',
-  padding: '0.5rem',
-}));
+function TaxonomyTree() {
+    const [treeData, setTreeData] = useState([]);
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: '#ffffff',
-  },
-  '&:nth-of-type(even)': {
-    backgroundColor: '#f5f5f5',
-    
-  },
-}));
+    // Crear un objeto de nodo
+    function createTreeNode(id, name, children, level) {
+        return { id, name, children, level };
+    }
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  margin: '0 5px',
-}));
+    // Cargar hijos de un nodo
+    async function loadNodeChildren(node, level) {
+        let url = '';
+        let data = [];
 
-const users = [
-  { id: 1, name: 'Juan Araque', email: 'jaraque129@puce.edu.ec' },
-  { id: 2, name: 'Usuario Puce', email: 'usuario@puce.edu.ec' },
-  { id: 3, name: 'Usuario Puce', email: 'usuario@puce.edu.ec' },
-  { id: 4, name: 'Usuario Puce', email: 'usuario@puce.edu.ec' },
-  { id: 5, name: 'Usuario Puce', email: 'usuario@puce.edu.ec' },
-];
+        switch (level) {
+            case 'reino':
+                url = `/filos/${node.id}`;
+                break;
+            case 'filo':
+                url = `/clases/${node.id}`;
+                break;
+            case 'clase':
+                url = `/ordenes/${node.id}`;
+                break;
+            case 'orden':
+                url = `/familias/${node.id}`;
+                break;
+            case 'familia':
+                url = `/generos/${node.id}`;
+                break;
+            case 'genero':
+                url = `/especies/${node.id}`;
+                break;
+            default:
+                break;
+        }
 
-const theme = createTheme();
+        const response = await fetch(url);
+        data = await response.json();
 
-function RoleAssignment() {
-  const [buttonColors, setButtonColors] = useState(Array(users.length * 3).fill("primary"));
+        const childNodes = data.map((item) => {
+            const newNode = createTreeNode(item.id, item.nombre, [], level);
+            node.children.push(newNode);
+            return newNode;
+        });
 
-  const handleClick = (index) => {
-    const newButtonColors = [...buttonColors];
-    newButtonColors[index] = newButtonColors[index] === "primary" ? "secondary" : "primary";
-    setButtonColors(newButtonColors);
-  };
+        return childNodes;
+    }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <div>
-       
-        <Container component="main" maxWidth="md" sx={{ py: 5, my: 8, boxShadow: 3 }}>
-          <CssBaseline />
-          <Typography variant="h5" align="center" gutterBottom>Asignación de Roles</Typography>
-          <TableContainer component={Paper} sx={{backgroundColor: 'transparent'}}>
-            <Table sx={{ minWidth: 700 }} aria-label="customized table">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', fontFamily: 'Helvetica Neue' }}>Usuarios</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', fontFamily: 'Helvetica Neue' }}>Email</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', fontFamily: 'Helvetica Neue' }}>Asignar Rol</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user, index) => (
-                  <StyledTableRow key={user.id}>
-                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'Helvetica Neue' }}>
-                      {user.name}
-                    </StyledTableCell>
-                    <StyledTableCell style={{ fontFamily: 'Helvetica Neue' }}> {user.email}</StyledTableCell>
-                    <StyledTableCell style={{ fontFamily: 'Helvetica Neue' }}>
-                      <ButtonGroup variant="text" aria-label="outlined primary button group">
-                        <StyledButton startIcon={<SupervisorAccountIcon />} variant={buttonColors[index*3] === "primary" ? "outlined" : "contained"} color="primary" onClick={() => handleClick(index*3)}>Administrador</StyledButton>
-                        <StyledButton startIcon={<ScienceIcon />} variant={buttonColors[index*3+1] === "primary" ? "outlined" : "contained"} color="primary" onClick={() => handleClick(index*3+1)}>Investigador</StyledButton>
-                        <StyledButton startIcon={<BuildIcon />} variant={buttonColors[index*3+2] === "primary" ? "outlined" : "contained"} color="primary" onClick={() => handleClick(index*3+2)}>Técnico</StyledButton>
-                      </ButtonGroup>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <Button variant="contained" color="primary" startIcon={<SaveIcon />} style={{ marginTop: '2px', marginBottom: '1px', float: 'right' }}>Guardar</Button>
-          </TableContainer>
-        </Container>
-      </div>
-    </ThemeProvider>
-  );
+    // Manejar evento de expansión de nodo
+    const handleNodeToggle = async (nodeId, nodeState) => {
+        if (nodeState.expanded && !treeData[nodeId].children.length) {
+            const nodeLevel = treeData[nodeId].level;
+            await loadNodeChildren(treeData[nodeId], nodeLevel);
+            setTreeData({ ...treeData });
+        }
+    };
+
+    // Obtener datos iniciales
+    async function fetchData() {
+        const response = await fetch('/reinos');
+        const data = await response.json();
+        const nodes = data.map((item) => createTreeNode(item.id, item.nombre, [], 'reino'));
+        setTreeData(nodes);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    // Renderizar los nodos del árbol de forma recursiva
+    const renderTree = (nodes) => {
+        return nodes.map((node) => (
+            <TreeItem key={node.id} nodeId={node.id} label={node.name} onToggle={handleNodeToggle}>
+                {Array.isArray(node.children) ? renderTree(node.children) : null}
+            </TreeItem>
+        ));
+    };
+
+    return (
+        <TreeView
+            defaultCollapseIcon={<ExpandMoreIcon />}
+            defaultExpandIcon={<ChevronRightIcon />}
+        >
+            {renderTree(treeData)}
+        </TreeView>
+    );
 }
 
-export default RoleAssignment;
+export default TaxonomyTree;

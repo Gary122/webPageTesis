@@ -16,7 +16,7 @@ const taxonRoutesFilo = require('./routes/routesTaxonomic/filo.routes') //taxon 
 const taxonRoutesFamilia = require('./routes/routesTaxonomic/familia.routes') //taxon familia
 const taxonRoutesClase = require('./routes/routesTaxonomic/clase..routes') //taxon clase
 const taxonRoutesEspecie = require('./routes/routesTaxonomic/especie.routes') //taxon especie
-const taxonTree = require('./routes/routesTaxonomic/treeTaxonomic.routes')
+const treeTaxonomic = require('./routes/routesTaxonomic/tree.routes')
 
 
 const app = express();
@@ -33,13 +33,15 @@ app.use(stateRoutes);
 
 ////Taxonomia
 app.use(taxonRoutesReino);
+app.use(treeTaxonomic);
 app.use(taxonRoutesOrden);
 app.use(taxonRoutesGenero);
 app.use(taxonRoutesFilo);
 app.use(taxonRoutesFamilia);
 app.use(taxonRoutesClase);
 app.use(taxonRoutesEspecie);
-app.use(taxonTree);
+
+
 
 
 app.use((err, req, res, next)=>{
