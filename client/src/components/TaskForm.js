@@ -1,95 +1,161 @@
-import React, { useState, useEffect } from 'react';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem from '@mui/lab/TreeItem';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import React, { useState, useEffect } from "react";
+import TreeView from "@mui/lab/TreeView";
+import { styled } from "@mui/material/styles";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
+import { Grid, Typography, Box, TextField, IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import axios from "axios";
 
-function TaxonomyTree() {
-    const [treeData, setTreeData] = useState([]);
+const StyledTreeItem = styled(TreeItem)(({ rootNode }) => {
+  const borderColor = "gray";
 
-    // Crear un objeto de nodo
-    function createTreeNode(id, name, children, level) {
-        return { id, name, children, level };
+  return {
+    position: "relative",
+    "&:before": {
+      pointerEvents: "none",
+      content: '""',
+      position: "absolute",
+      width: 32,
+      left: -16,
+      top: 12,
+      borderBottom: !rootNode ? `1px dashed ${borderColor}` : "none"
+    },
+    [`& .${treeItemClasses.group}`]: {
+      marginLeft: 16,
+      paddingLeft: 18,
+      borderLeft: `1px dashed ${borderColor}`
     }
+  };
+});
 
-    // Cargar hijos de un nodo
-    async function loadNodeChildren(node, level) {
-        let url = '';
-        let data = [];
+const StyledBox = styled(Box)({
+  width: "90%",
+  fontSize: "1.2em",
+  margin: "20px auto",
+  textAlign: "center",
+  "& p": {
+    textAlign: "justify",
+    color: "#000000",
+    fontFamily: "Helvetica Neue",
+    margin: "20px 10px"
+  },
+  maxWidth: "250px",
+  color: "#000000" // Cambia el color del texto a negro
+});
 
-        switch (level) {
-            case 'reino':
-                url = `/filos/${node.id}`;
-                break;
-            case 'filo':
-                url = `/clases/${node.id}`;
-                break;
-            case 'clase':
-                url = `/ordenes/${node.id}`;
-                break;
-            case 'orden':
-                url = `/familias/${node.id}`;
-                break;
-            case 'familia':
-                url = `/generos/${node.id}`;
-                break;
-            case 'genero':
-                url = `/especies/${node.id}`;
-                break;
-            default:
-                break;
-        }
+const StyledTreeView = styled(TreeView)({
+  "& .MuiTreeItem-content": {
+    color: "#000000", // Cambiar el color del texto cuando el árbol se despliega
+  },
+});
 
-        const response = await fetch(url);
-        data = await response.json();
+export default function FileSystemNavigator() {
+  const [reinos, setReinos] = useState([]);
+  const [filos, setFilos] = useState([]);
+  const [searchText, setSearchText] = useState("");
 
-        const childNodes = data.map((item) => {
-            const newNode = createTreeNode(item.id, item.nombre, [], level);
-            node.children.push(newNode);
-            return newNode;
-        });
+  useEffect(() => {
+    // Obtener los reinos al cargar el componente
+    fetchReinos();
+  }, []);
 
-        return childNodes;
+  const fetchReinos = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/reinos");
+      setReinos(response.data);
+    } catch (error) {
+      console.error("Error fetching reinos data: ", error);
     }
+  };
 
-    // Manejar evento de expansión de nodo
-    const handleNodeToggle = async (nodeId, nodeState) => {
-        if (nodeState.expanded && !treeData[nodeId].children.length) {
-            const nodeLevel = treeData[nodeId].level;
-            await loadNodeChildren(treeData[nodeId], nodeLevel);
-            setTreeData({ ...treeData });
-        }
-    };
-
-    // Obtener datos iniciales
-    async function fetchData() {
-        const response = await fetch('/reinos');
-        const data = await response.json();
-        const nodes = data.map((item) => createTreeNode(item.id, item.nombre, [], 'reino'));
-        setTreeData(nodes);
+  const fetchFilos = async (reinoId) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/filos/${reinoId}`);
+      setFilos(response.data);
+    } catch (error) {
+      console.error("Error fetching filos data: ", error);
     }
+  };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+  const handleReinoClick = (event, nodeId) => {
+    if (nodeId) {
+      const reinoId = nodeId.split("-")[1];
+      const reino = reinos.find((reino) => reino.rei_id.toString() === reinoId);
+      if (reino) {
+        fetchFilos(reinoId);
+      }
+    }
+  };
 
-    // Renderizar los nodos del árbol de forma recursiva
-    const renderTree = (nodes) => {
-        return nodes.map((node) => (
-            <TreeItem key={node.id} nodeId={node.id} label={node.name} onToggle={handleNodeToggle}>
-                {Array.isArray(node.children) ? renderTree(node.children) : null}
-            </TreeItem>
-        ));
-    };
+  const renderReinos = () => {
+    return reinos.map((reino) => (
+      <StyledTreeItem
+        key={reino.rei_id}
+        nodeId={`reino-${reino.rei_id}`}
+        label={reino.rei_nombre.trim()}
+        onClick={(event) => handleReinoClick(event, `reino-${reino.rei_id}`)}
+      />
+    ));
+  };
 
-    return (
-        <TreeView
-            defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpandIcon={<ChevronRightIcon />}
-        >
-            {renderTree(treeData)}
-        </TreeView>
-    );
+  const renderFilos = () => {
+    return filos.map((filo) => (
+      <StyledTreeItem
+        key={filo.fil_id}
+        nodeId={`filo-${filo.fil_id}`}
+        label={filo.fil_nombre.trim()}
+      />
+    ));
+  };
+
+  return (
+    <Box>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          {/* Contenedor del Árbol y Trabajo académico */}
+          <Box
+            border={1}
+            borderColor="#333333"
+            p={2}
+            borderRadius={2}
+            minHeight="100vh"
+            display="flex"
+            flexDirection="column"
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                {/* Árbol filogenético */}
+                <StyledTreeView
+                  defaultCollapseIcon={<ExpandMoreIcon />}
+                  defaultExpandIcon={<ChevronRightIcon />}
+                  sx={{ height: 240, flexGrow: 1 }}
+                >
+                  {/* Resto del árbol */}
+                  {renderReinos()}
+                </StyledTreeView>
+              </Grid>
+              <Grid item xs={8}>
+                {/* Contenido del panel derecho */}
+                <Typography variant="h5" component="h2">
+                  Filos
+                </Typography>
+                {filos.length === 0 ? (
+                  <Typography variant="body1">Seleccione un reino para ver los filos.</Typography>
+                ) : (
+                  <StyledTreeView
+                    defaultCollapseIcon={<ExpandMoreIcon />}
+                    defaultExpandIcon={<ChevronRightIcon />}
+                  >
+                    {renderFilos()}
+                  </StyledTreeView>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }
-
-export default TaxonomyTree;

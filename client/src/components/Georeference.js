@@ -113,6 +113,7 @@ export default function TaskList() {
 
     const loadTasks = async (province) => {
         const response = await fetch(`http://localhost:4000/consult/${province}`);
+        
         const data = await response.json();
         if (data.message) {
             setOpenDialog(true);
