@@ -60,10 +60,10 @@ export default function Navbar() {
             <span className={classes.logoText}>Bio-Inka</span>
             </Typography>
             <Box className={classes.navLinks}>
-            <Link to="/inicio/iniciova" className={`${classes.navLink} ${classes.navLinkHover}`}>Búsqueda</Link>
-              <Link to="/inicio/geo" className={`${classes.navLink} ${classes.navLinkHover}`}>Georreferenciación</Link>
-              <Link to="/inicio/iniciova" className={`${classes.navLink} ${classes.navLinkHover}`}>Destacados</Link>
-              <Link to="/inicio/about" className={`${classes.navLink} ${classes.navLinkHover}`}>Acerca de nosotros</Link>
+            <Link to="/inicio/busqueda" className={`${classes.navLink} ${classes.navLinkHover}`}>Búsqueda</Link>
+              <Link to="/inicio/georeferencia" className={`${classes.navLink} ${classes.navLinkHover}`}>Georreferenciación</Link>
+              <Link to="/inicio/busquedaTaxon" className={`${classes.navLink} ${classes.navLinkHover}`}>Destacados</Link>
+              <Link to="/inicio/acerca" className={`${classes.navLink} ${classes.navLinkHover}`}>Acerca de nosotros</Link>
               <Link to="/inicio/login" className={`${classes.navLink} ${classes.navLinkHover}`}>Log-In</Link>
             </Box>
           </Toolbar>

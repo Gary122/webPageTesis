@@ -45,9 +45,46 @@ router.get('/generos/:familiaId', async (req, res) => {
 
 // Devuelve todas las especies de un genero específico
 router.get('/especies/:generoId', async (req, res) => {
+
+    const consult =
+        "SELECT ESPECIE.ESP_ID, " +
+        "ESPECIE.GEN_ID, " +
+        "ESPECIE.ESP_NOMBRE, " +
+        "ESPECIE.ESP_SEXO, " +
+        "REFE.REF_TITULO, " +
+        "REFE.REF_DOI " +
+        "FROM ESPECIE " +
+        "INNER JOIN ESPECIE_REFERENCIA AS ESP_REF ON ESPECIE.ESP_ID =ESP_REF.ESP_ID " +
+        "INNER JOIN REFERENCIA AS REFE ON ESP_REF.REF_ID =REFE.REF_ID " +
+        "WHERE GEN_ID = $1 ";
+
+
     const { generoId } = req.params;
-    const { rows: especies } = await pool.query('SELECT * FROM especie WHERE gen_id = $1', [generoId]);
+    const { rows: especies } = await pool.query(consult, [generoId]);
     res.json(especies);
+});
+
+router.get('/noticias/:pais', async (req, res) => {
+
+    const consult =
+        "SELECT DISTINCT ON (ref_doi) referencia.ref_doi, " +
+        "referencia.ref_titulo, " +
+        "referencia.ref_resumen " +
+        "FROM referencia " +
+        "JOIN especie_referencia ON referencia.ref_id = especie_referencia.ref_id " +
+        "JOIN especie ON especie_referencia.esp_id = especie.esp_id " +
+        "JOIN localizacion ON especie.esp_id = localizacion.esp_id " +
+        "JOIN localizacion_provincia ON localizacion.loc_id = localizacion_provincia.loc_id " +
+        "JOIN provincia ON localizacion_provincia.pro_id = provincia.pro_id " +
+        "JOIN pais ON provincia.pas_id = pais.pas_id " +
+        "WHERE pais.pas_nombre = $1 " +
+        "AND referencia.ref_doi != 'Sin DOI' " +
+        "ORDER BY ref_doi ";
+
+
+    const { pais } = req.params;
+    const { rows: noticias } = await pool.query(consult, [pais]);
+    res.json(noticias);
 });
 
 module.exports = router;
