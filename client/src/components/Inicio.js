@@ -8,7 +8,7 @@ import { Grid, Typography, Box, TextField, IconButton, Button } from "@mui/mater
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
 import { Link } from 'react-router-dom';
-
+import { Autocomplete } from '@mui/lab';
 
 const StyledTreeItem = styled(TreeItem)(({ rootNode, hasData }) => {
   const borderColor = "gray";
@@ -69,29 +69,12 @@ const StyledBox = styled(Box)({
 
 export default function FileSystemNavigator() {
   const [searchText, setSearchText] = useState("");
+  const [searchTextCountry, setSearchTextCountry] = useState("");
 
   const [showContent, setShowContent] = useState(false);
 
-  const handleButtonClick = async () => {
-    try {
-      const response = await axios.get("http://localhost:4000/noticias/Ecuador");
-      setNoticias(response.data);
-      setShowContent(!showContent);
-    } catch (error) {
-      console.error("Error fetching noticias data: ", error);
-    }
-  };
-
-
-
-  const handleSearchChange = (event) => {
-    setSearchText(event.target.value);
-  };
-
   const [colorNiveles, setColorNiveles] = useState({});
   const [colorItems, setColorItems] = useState({});
-
-
 
   const [reinos, setReinos] = useState([]);
   const [filos, setFilos] = useState([]);
@@ -110,6 +93,12 @@ export default function FileSystemNavigator() {
 
   const [noticias, setNoticias] = useState([]);
 
+  const [countryOptions, setCountryOptions] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [noInvestigacionesMessage, setNoInvestigacionesMessage] = useState("");
+  const [speciesOptions, setSpeciesOptions] = useState([]);
+
+
 
   const colorNivel = "#00000073"
   const colorItem = "#1890FF"
@@ -122,6 +111,8 @@ export default function FileSystemNavigator() {
     // Obtener los reinos al cargar el componente
     fetchReinos();
   }, []);
+
+  ///////////////////////////////////   LOGICA ////////////////////////////////////////////////////////
 
   const fetchReinos = async () => {
     try {
@@ -337,6 +328,31 @@ export default function FileSystemNavigator() {
     }
   };
 
+  const fetchCountries = async () => {
+    try {
+      const response = await axios.get('http://localhost:4000/country');
+      const countriesData = response.data.map((country) => ({
+        label: country.pas_nombre.trim(),
+        value: country.pas_nombre.trim()
+      }));
+      setCountryOptions(countriesData);
+    } catch (error) {
+      console.error('Error fetching countries data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCountries();
+  }, []);
+
+
+  ///////////////////////////////////     EVENTOS  ////////////////////////////////////////////////////////
+
+
+  const handleCountryChange = (event, value) => {
+    setSelectedCountry(value);
+  };
+
   const handleReinoClick = (event, nodeId) => {
     if (nodeId) {
       const reinoId = nodeId.split("-")[1];
@@ -412,6 +428,45 @@ export default function FileSystemNavigator() {
     }
   };
 
+  const handleButtonClickNoticias = async () => {
+    if (selectedCountry) {
+      setNoticias([]);
+      try {
+        const countryParam = selectedCountry.value.trim();
+        const url = `http://localhost:4000/noticias/${countryParam}`;
+        const response = await axios.get(url);
+        const noticiasData = response.data;
+
+        if (noticiasData.length === 0) {
+          setNoInvestigacionesMessage(
+            "Por el momento no hay Investigaciones en nuestro sistema con el país seleccionado."
+          );
+        } else {
+          setNoticias(noticiasData);
+          setShowContent(!showContent);
+          setNoInvestigacionesMessage(""); // Limpiar el mensaje si hay investigaciones
+        }
+      } catch (error) {
+        console.error("Error fetching noticias data: ", error);
+      }
+    }
+  };
+
+  const handleSpeciesSearch = async (event, value) => {
+    try {
+      const response = await axios.get("http://localhost:4000/taxonEspecie");
+      const speciesData = response.data;
+      setSpeciesOptions(speciesData.map((species) => species.esp_nombre.trim()));
+    } catch (error) {
+      console.error("Error fetching species data: ", error);
+    }
+  };
+
+
+
+  ///////////////////////////////////   RENDERS  ////////////////////////////////////////////////////////
+
+
   const renderReinos = () => {
     return reinos.map((reino) => (
       <StyledTreeItem
@@ -458,8 +513,6 @@ export default function FileSystemNavigator() {
     ));
   };
 
-
-
   const renderClases = (filoId) => {
     const clasesOfFilo = clases.filter((clase) => clase.fil_id === filoId);
 
@@ -483,8 +536,6 @@ export default function FileSystemNavigator() {
       </StyledTreeItem>
     ));
   };
-
-
 
   const renderOrdenes = (claseId) => {
     const ordenesOfClase = ordenes.filter((orden) => orden.cla_id === claseId);
@@ -510,7 +561,6 @@ export default function FileSystemNavigator() {
     ));
   };
 
-
   const renderFamilias = (ordenId) => {
     const familiasOfOrden = familias.filter((familia) => familia.ord_id === ordenId);
 
@@ -535,7 +585,6 @@ export default function FileSystemNavigator() {
     ));
   };
 
-
   const renderGeneros = (familiaId) => {
     const generosOfFamilia = generos.filter((genero) => genero.fam_id === familiaId);
 
@@ -559,7 +608,6 @@ export default function FileSystemNavigator() {
       </StyledTreeItem>
     ));
   };
-
 
   const renderEspecies = (generoId) => {
     const especiesOfGenero = especies.filter((especie) => especie.gen_id === generoId);
@@ -596,6 +644,7 @@ export default function FileSystemNavigator() {
   };
 
 
+  ///////////////////////////////////   GRAFICA  ////////////////////////////////////////////////////////
 
 
   return (
@@ -619,21 +668,14 @@ export default function FileSystemNavigator() {
           <Grid container spacing={2}>
             <Grid item xs={4}>
               <StyledBox>
-                <Typography variant="h6">Árbol filogenético</Typography>
-                <TextField
-                  value={searchText}
-                  onChange={handleSearchChange}
-                  placeholder="Buscar..."
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton>
-                        <SearchIcon />
-                      </IconButton>
-                    )
-                  }}
+                <Typography variant="h6">Árbol Filogenético</Typography>
+                <Autocomplete
+                  options={speciesOptions}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Especie" variant="outlined" />
+                  )}
+                  onInputChange={handleSpeciesSearch}
                 />
               </StyledBox>
               {/* Árbol filogenético */}
@@ -652,9 +694,37 @@ export default function FileSystemNavigator() {
                 <StyledBox>
                   <Typography variant="h6">Investigaciones</Typography>
                   {/* Contenido del trabajo académico */}
-                  <Button variant="contained" color="primary" onClick={handleButtonClick}>
-                    Mi botón
-                  </Button>
+
+                  <Autocomplete
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                    options={countryOptions}
+                    getOptionLabel={(option) => option.label}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Seleccionar País"
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {params.InputProps.endAdornment}
+                              <IconButton>
+                                <SearchIcon onClick={handleButtonClickNoticias} />
+                              </IconButton>
+                            </>
+                          )
+                        }}
+                      />
+                    )}
+                  />
+                  <Typography variant="body2" color="error">
+                    {noInvestigacionesMessage}
+                  </Typography>
+
                   {showContent && (
                     <>
                       {noticias.map((noticia, index) => (
@@ -664,7 +734,7 @@ export default function FileSystemNavigator() {
                               {noticia.ref_titulo}
                             </Typography>
                           </Link>
-                          <Typography variant="body1" style={{ textAlign: "justify", fontSize: "14px",  color: "#666666", fontFamily: "Helvetica Neue", marginBottom: "20px" }}>
+                          <Typography variant="body1" style={{ textAlign: "justify", fontSize: "14px", color: "#666666", fontFamily: "Helvetica Neue", marginBottom: "20px" }}>
                             {noticia.ref_resumen}
                           </Typography>
                         </div>
