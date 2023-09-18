@@ -13,7 +13,7 @@ import { Autocomplete } from '@mui/lab';
 const StyledTreeItem = styled(TreeItem)(({ rootNode, hasData }) => {
   const borderColor = "gray";
   const nivelColor = "#808080"; // Color para el nivel "Reino"
-  const itemColor = "#1890FF"; // Color para el nombre del elemento
+  const itemColor = "#189FFF"; // Color para el nombre del elemento
 
   return {
     position: "relative",
@@ -61,15 +61,14 @@ const StyledBox = styled(Box)({
     textAlign: "justify",
     color: "#000000",
     fontFamily: "Helvetica Neue",
-    margin: "20px 10px"
+    margin: "20px 20px"
   },
   maxWidth: "600px",
   color: "#000000" // Cambia el color del texto a negro
 });
 
 export default function FileSystemNavigator() {
-  const [searchText, setSearchText] = useState("");
-  const [searchTextCountry, setSearchTextCountry] = useState("");
+  
 
   const [showContent, setShowContent] = useState(false);
 
@@ -102,8 +101,8 @@ export default function FileSystemNavigator() {
 
   const colorNivel = "#00000073"
   const colorItem = "#1890FF"
-  const tamanoNivel = "14px"
-  const tamanoItem = "12px"
+  const tamanoNivel = "15px"
+  const tamanoItem = "14px"
   const tipoLetra = "Helvetica Neue"
 
 
@@ -653,7 +652,7 @@ export default function FileSystemNavigator() {
         <Grid item xs={12}>
           {/* Descripción */}
           <StyledBox>
-            <Typography variant="h5">Descripción</Typography>
+            <Typography variant="h5" fontFamily="Helvetica Neue">Descripción</Typography>
             <Typography variant="body1" fontFamily="Helvetica Neue">
               Nuestro sitio web es una plataforma diseñada para facilitar la
               georreferenciación de datos de especies. Con su interfaz fácil de usar
@@ -707,6 +706,7 @@ export default function FileSystemNavigator() {
                         variant="outlined"
                         size="small"
                         fullWidth
+                        sx={{ width: '50%', fontSize: '12px' }}
                         InputProps={{
                           ...params.InputProps,
                           endAdornment: (

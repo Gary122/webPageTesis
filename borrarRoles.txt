@@ -1,0 +1,11 @@
+
+-- Revocar los privilegios en la base de datos
+REVOKE ALL PRIVILEGES ON DATABASE proyecto_titulacion FROM usuarioprueba2;
+
+-- Revocar los privilegios en el esquema
+REVOKE ALL PRIVILEGES ON SCHEMA myschema FROM usuarioprueba2;
+
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA myschema REVOKE ALL PRIVILEGES ON TABLES FROM usuarioprueba2;
+
+DROP ROLE usuarioprueba2;

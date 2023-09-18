@@ -1,0 +1,55 @@
+ALTER TABLE clase  OWNER TO postgres;
+ALTER TABLE colector  OWNER TO postgres;
+ALTER TABLE especie  OWNER TO postgres;
+ALTER TABLE especie_colector  OWNER TO postgres;
+ALTER TABLE especie_identificador OWNER TO postgres;
+ALTER TABLE especie_referencia OWNER TO postgres;
+ALTER TABLE familia OWNER TO postgres;
+ALTER TABLE filo  OWNER TO postgres;
+ALTER TABLE genero OWNER TO postgres;
+ALTER TABLE identificador OWNER TO postgres;
+ALTER TABLE localizacion OWNER TO postgres;
+ALTER TABLE localizacion_provincia OWNER TO postgres;
+ALTER TABLE orden  OWNER TO postgres;
+ALTER TABLE pais OWNER TO postgres;
+ALTER TABLE provincia OWNER TO postgres;
+ALTER TABLE referencia OWNER TO postgres;
+ALTER TABLE  reino  OWNER TO postgres;
+ALTER TABLE spatial_ref_sys OWNER TO postgres;
+ALTER TABLE geography_columns OWNER TO postgres;
+ALTER TABLE geometry_columns OWNER TO postgres;
+
+
+
+-- Revocar permisos de lectura en la tabla "clase" otorgados por el rol "investigador"
+REVOKE SELECT ON TABLE clase FROM investigador;
+REVOKE SELECT ON TABLE colector FROM investigador;
+REVOKE SELECT ON TABLE especie FROM investigador;
+REVOKE SELECT ON TABLE especie_colector FROM investigador;
+REVOKE SELECT ON TABLE especie_identificador FROM investigador;
+REVOKE SELECT ON TABLE especie_referencia FROM investigador;
+REVOKE SELECT ON TABLE familia FROM investigador;
+REVOKE SELECT ON TABLE filo FROM investigador;
+REVOKE SELECT ON TABLE genero FROM investigador;
+REVOKE SELECT ON TABLE identificador FROM investigador;
+REVOKE SELECT ON TABLE localizacion FROM investigador;
+REVOKE SELECT ON TABLE localizacion_provincia FROM investigador;
+REVOKE SELECT ON TABLE orden FROM investigador;
+REVOKE SELECT ON TABLE pais FROM investigador;
+REVOKE SELECT ON TABLE provincia FROM investigador;
+REVOKE SELECT ON TABLE referencia FROM investigador;
+REVOKE SELECT ON TABLE reino FROM investigador;
+REVOKE SELECT ON TABLE spatial_ref_sys FROM investigador;
+REVOKE SELECT ON TABLE geography_columns FROM investigador;
+REVOKE SELECT ON TABLE geometry_columns FROM investigador;
+
+
+
+-- Revocar todos los privilegios otorgados por el rol "investigador" en todas las tablas y vistas
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM investigador;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM investigador;
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM investigador;
+
+
+DROP ROLE investigador;
+

@@ -176,7 +176,7 @@ export default function TaskList() {
             }
           }}>
             <h2>Descripción</h2>
-            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+            <p>Se puede filtrar especie por provincia y se muestra a continuación la tabla detallada. </p>
           </Box>
           <Box sx={{ width: { xs: '100%', sm: '45%' }, fontSize: '1.2em', margin: '0 10px' }}>
 

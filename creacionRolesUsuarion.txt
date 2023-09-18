@@ -1,0 +1,25 @@
+-- Crear el rol "Usuarios"
+CREATE ROLE usuarios;
+
+-- Otorgar permisos de conexión a la base de datos
+GRANT CONNECT ON DATABASE proyecto_titulacion TO usuarios;
+
+-- Crear el esquema "myschema" si no existe
+--CREATE SCHEMA IF NOT EXISTS myschema;
+
+-- Otorgar permisos de uso en el esquema
+GRANT USAGE ON SCHEMA myschema TO usuarios;
+
+-- Otorgar permisos de selección en todas las tablas del esquema
+GRANT SELECT ON ALL TABLES IN SCHEMA myschema TO usuarios;
+
+-- Otorgar permisos predeterminados en el esquema
+ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT ON TABLES TO usuarios;
+
+-- Crear los usuarios y asignarles el rol "Usuarios"
+CREATE USER usuario_prueba1 WITH PASSWORD 'usuarioprueba1';
+CREATE USER usuario_prueba2 WITH PASSWORD 'usuarioprueba2';
+
+GRANT usuarios TO usuario_prueba1;
+GRANT usuarios TO usuario_prueba2;
+

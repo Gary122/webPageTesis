@@ -60,6 +60,25 @@ const getGenero = async (req, res, next) => {
 
 };
 
+const getGenNombre = async (req, res, next) => {
+    try {
+        const { genero_nombre } = req.params
+
+        const result = await pool.query('SELECT gen_id FROM genero WHERE gen_nombre = $1', [genero_nombre])
+        console.log(result)
+
+        if (result.rows.length === 0)
+            return res.status(404).json({
+                message: "tarea no encontrada"
+            });
+        return res.json(result.rows[0]);
+    } catch (error) {
+        next(error)
+    }
+
+};
+
+
 const createGenero = async (req, res) => {
     const { pas_nombre } = req.body
 
@@ -120,6 +139,7 @@ module.exports = {
     getAllGenero,
     getGeneroByFamilia,
     getGenero,
+    getGenNombre,
     createGenero,
     deleteGenero,
     updateGenero

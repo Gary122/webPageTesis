@@ -1,5 +1,7 @@
 const { Pool } = require("pg");
+const { PoolJ } = require("pg");
 const {db} = require('./config')
+const {dbj} = require('./configj')
 
 const pool = new Pool({
     user: db.user,
@@ -8,5 +10,7 @@ const pool = new Pool({
     port: db.port,
     database: db.database
 })
+
+
 
 module.exports = pool;

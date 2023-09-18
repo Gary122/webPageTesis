@@ -1,0 +1,32 @@
+select * from especie
+
+INSERT INTO especie (gen_id, esp_nombre, esp_sexo) VALUES (6, 'sss',  'sssss');
+
+DELETE FROM especie WHERE esp_id IN (47, 48, 49, 50);
+
+
+INSERT INTO especie (esp_id ,gen_id, esp_nombre, esp_sexo)
+SELECT COALESCE(MAX(esp_id), 0) + 1, 2, 'especieVa', 'hembra'
+FROM especie;
+
+
+como incorporo este query:
+INSERT INTO especie (esp_id ,gen_id, esp_nombre, esp_sexo)
+SELECT COALESCE(MAX(esp_id), 0) + 1, 2, 'especieVa', 'hembra'
+FROM especie;
+
+
+
+
+en este codigo:
+router.post('/especies', async (req, res) => {
+    const { esp_id, gen_id, esp_nombre, esp_sexo } = req.body;
+
+    try {
+        await pool.query('INSERT INTO especie (gen_id, esp_nombre, esp_sexo) VALUES ($1, $2, $3)', [ gen_id, esp_nombre, esp_sexo]);
+        res.sendStatus(200); // Inserción exitosa
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500); // Error en el servidor
+    }
+});

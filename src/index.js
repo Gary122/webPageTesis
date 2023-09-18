@@ -17,6 +17,8 @@ const taxonRoutesFamilia = require('./routes/routesTaxonomic/familia.routes') //
 const taxonRoutesClase = require('./routes/routesTaxonomic/clase..routes') //taxon clase
 const taxonRoutesEspecie = require('./routes/routesTaxonomic/especie.routes') //taxon especie
 const treeTaxonomic = require('./routes/routesTaxonomic/tree.routes')
+const ingreso = require('./routes/routesTaxonomic/login.routes')
+const insertar = require('./routes/routesTaxonomic/insertar.routes')
 
 
 const app = express();
@@ -40,6 +42,8 @@ app.use(taxonRoutesFilo);
 app.use(taxonRoutesFamilia);
 app.use(taxonRoutesClase);
 app.use(taxonRoutesEspecie);
+app.use(ingreso);
+app.use(insertar);
 
 
 

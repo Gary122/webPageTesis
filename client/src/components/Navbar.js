@@ -1,5 +1,5 @@
 import { AppBar, Box, Container, Toolbar, Typography } from "@mui/material";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -7,7 +7,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#fcfcfc',
     color: '#333',
     borderBottom: '1px solid #ddd',
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', // Sombra en la parte inferior del navbar
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 999,
   },
   navbar: {
     display: 'flex',
@@ -22,11 +25,9 @@ const useStyles = makeStyles((theme) => ({
     color: '#333',
     fontFamily: 'Helvetica Neue',
   },
-
   logoText: {
-    fontFamily: 'Helvetica Neue', // Tipo de letra para el texto del logo
+    fontFamily: 'Helvetica Neue',
   },
-
   navLinks: {
     display: 'flex',
     gap: '1rem',
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     padding: '0.5rem',
     borderRadius: '0.25rem',
     transition: 'background-color 0.3s ease',
-    fontFamily: 'Helvetica Neue', 
+    fontFamily: 'Helvetica Neue',
   },
   navLinkHover: {
     '&:hover': {
@@ -47,24 +48,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Navbar() {
+export default function Navbar({ linkText }) {
   const classes = useStyles();
-  const navigate = useNavigate();
 
   return (
     <div className={classes.navbarContainer}>
-      <AppBar position="static" color="transparent" elevation={0}>
+      <AppBar elevation={2} style={{ backgroundColor: '#fcfcfc' }}>
         <Container maxWidth="lg">
           <Toolbar className={classes.navbar}>
             <Typography variant="h6" component={Link} to="/" className={classes.logo}>
-            <span className={classes.logoText}>Bio-Inka</span>
+              <span className={classes.logoText}>Bio-Inka</span>
             </Typography>
             <Box className={classes.navLinks}>
-            <Link to="/inicio/busqueda" className={`${classes.navLink} ${classes.navLinkHover}`}>Búsqueda</Link>
+              <Link to="/inicio/busqueda" className={`${classes.navLink} ${classes.navLinkHover}`}>Búsqueda</Link>
               <Link to="/inicio/georeferencia" className={`${classes.navLink} ${classes.navLinkHover}`}>Georreferenciación</Link>
               <Link to="/inicio/busquedaTaxon" className={`${classes.navLink} ${classes.navLinkHover}`}>Destacados</Link>
               <Link to="/inicio/acerca" className={`${classes.navLink} ${classes.navLinkHover}`}>Acerca de nosotros</Link>
-              <Link to="/inicio/login" className={`${classes.navLink} ${classes.navLinkHover}`}>Log-In</Link>
+              <Link to="/inicio/login" className={`${classes.navLink} ${classes.navLinkHover}`}>{linkText}</Link>
             </Box>
           </Toolbar>
         </Container>
